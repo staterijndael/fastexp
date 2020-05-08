@@ -1,0 +1,5 @@
+bindAddr = ":8080"
+logLevel = "debug"
+
+[store]
+databaseUrl = "host=localhost dbname=planecontrol sslmode=disable password=123 user=postgres"
