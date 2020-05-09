@@ -1,4 +1,4 @@
 bindAddr = ":8080"
 logLevel = "debug"
-databaseUrl = "host=ec2-52-71-55-81.compute-1.amazonaws.com dbname=des2vvo733roia  password=27e87476f18b8a2e43eaf13018c49990343959b55c112120889222e704c12b66 user=widsrwyxkskrvr"
+databaseUrl = "host=ec2-52-87-135-240.compute-1.amazonaws.com dbname=d4u4dcahe5laci  password=5158df64cd1ce277ebd6f6baa7643b0809bdb1099b6309223034984474a84ddd user=tpaveqgcijkxhs"
 sessionKey = "FhNKShL1Jd1qEYWPvFw1WfbihEddsKccvVDFNC4KwPe8sQjkZu3L5KBKfMgtnqQFxMiYANBSAhnTtkqAYhlnDYW433ottvuLBgw9B2IjSQitrUlZtAx0tsRNTD8fFvIw"
