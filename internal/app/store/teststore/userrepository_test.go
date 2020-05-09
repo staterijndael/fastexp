@@ -46,3 +46,13 @@ func TestUserRepository_Find(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, u2)
 }
+
+func TestUserRepository_AddTag(t *testing.T) {
+
+	s := teststore.New()
+	u1 := model.TestUser(t)
+	s.User().Create(u1)
+	tags := []string{"asdasdasd", "asdasdads", "212kkasd", "sadasd"}
+	err := s.User().AddTags(u1.ID, tags)
+	assert.NoError(t, err)
+}

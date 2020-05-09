@@ -1,6 +1,8 @@
 package teststore
 
 import (
+	"unicode/utf8"
+
 	"github.com/Oringik/fastexp/internal/app/model"
 	"github.com/Oringik/fastexp/internal/app/store"
 )
@@ -47,4 +49,36 @@ func (r *UserRepository) Find(id int) (*model.User, error) {
 	}
 
 	return u, nil
+}
+
+// AddTags ...
+func (r *UserRepository) AddTags(userID int, tags []string) error {
+	u, ok := r.users[userID]
+
+	if !ok {
+		return store.ErrRecordNotFound
+	}
+
+	for _, tag := range tags {
+
+		if _, ok2 := r.users[userID]; !ok2 {
+			return store.WrongUserTag
+		}
+
+		if utf8.RuneCountInString(tag) > 10 {
+			return store.TagWrongLength
+		}
+		if utf8.RuneCountInString(tag) == 0 {
+			return store.TagIsNull
+		}
+
+		tagStruct := &model.Tag{
+			UserID: userID,
+			Text:   tag,
+		}
+
+		u.Tags = append(u.Tags, tagStruct)
+	}
+
+	return nil
 }

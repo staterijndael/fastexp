@@ -1,4 +1,4 @@
 bindAddr = ":8080"
 logLevel = "debug"
-databaseUrl = "host=ec2-52-87-135-240.compute-1.amazonaws.com password=5158df64cd1ce277ebd6f6baa7643b0809bdb1099b6309223034984474a84ddd user=tpaveqgcijkxhs dbname=d4u4dcahe5laci"
+databaseUrl = "host=localhost dbname=planecontrol sslmode=disable password=123 user=postgres"
 sessionKey = "FhNKShL1Jd1qEYWPvFw1WfbihEddsKccvVDFNC4KwPe8sQjkZu3L5KBKfMgtnqQFxMiYANBSAhnTtkqAYhlnDYW433ottvuLBgw9B2IjSQitrUlZtAx0tsRNTD8fFvIw"
