@@ -1,17 +1,17 @@
 package apiserver
 
-import "github.com/Oringik/fastexp/internal/app/store"
-
+// Config ...
 type Config struct {
-	BindAddr string `toml:"bindAddr"`
-	LogLevel string `toml:"logLevel"`
-	Store    *store.Config
+	BindAddr    string `toml:"bindAddr"`
+	LogLevel    string `toml:"logLevel"`
+	DatabaseURL string `toml:"databaseUrl`
+	SessionKey  string `toml:"sessionKey"`
 }
 
+// NewConfig ...
 func NewConfig() *Config {
 	return &Config{
 		BindAddr: ":8080",
 		LogLevel: "debug",
-		Store:    store.NewConfig(),
 	}
 }
