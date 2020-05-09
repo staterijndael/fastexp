@@ -72,7 +72,7 @@ func (r *UserRepository) AddTags(userID int, tags []string) error {
 			return store.TagIsNull
 		}
 
-		tagStruct := &model.Tag{
+		tagStruct := model.Tag{
 			UserID: userID,
 			Text:   tag,
 		}
@@ -81,4 +81,16 @@ func (r *UserRepository) AddTags(userID int, tags []string) error {
 	}
 
 	return nil
+}
+
+// GetTags ...
+func (r *UserRepository) GetTags(userID int) ([]model.Tag, error) {
+
+	return nil, nil
+}
+
+// CreateTheme ...
+func (r *UserRepository) CreateTheme(th *model.Theme) error {
+	return nil
+
 }

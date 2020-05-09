@@ -1,4 +1,4 @@
 CREATE TABLE tags (
-  user_id varchar not null,
+  user_id INTEGER not null,
   msg varchar(10)
 );

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Oringik/fastexp/internal/app/model"
 	"github.com/Oringik/fastexp/internal/app/store"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/sirupsen/logrus"
@@ -50,13 +51,23 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
-	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST")
-	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST")
+
+	cors := handlers.CORS(
+		handlers.AllowedHeaders([]string{"content-type"}),
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowCredentials(),
+	)
+
+	s.router.Use(cors)
+	s.router.HandleFunc("/users", s.handleUsersCreate()).Methods("POST", "OPTIONS")
+	s.router.HandleFunc("/sessions", s.handleSessionsCreate()).Methods("POST", "OPTIONS")
 
 	private := s.router.PathPrefix("/private").Subrouter()
 
 	private.Use(s.authenticateUser)
-	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET")
+	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET", "OPTIONS")
+	private.HandleFunc("/addtags", s.handleAddTags()).Methods("POST", "OPTIONS")
+	private.HandleFunc("/createtheme", s.handleAddTags()).Methods("POST", "OPTIONS")
 }
 
 func (s *server) authenticateUser(next http.Handler) http.Handler {
@@ -84,7 +95,34 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 
 func (s *server) handleWhoami() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s.respond(w, r, http.StatusOK, r.Context().Value(ctxKeyUser).(*model.User))
+		user := r.Context().Value(ctxKeyUser).(*model.User)
+		s.setTags(user)
+		s.respond(w, r, http.StatusOK, user)
+	}
+
+}
+
+func (s *server) handleAddTags() http.HandlerFunc {
+	type request struct {
+		Tags []string `json:"tags"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		user := r.Context().Value(ctxKeyUser).(*model.User)
+
+		if err := s.store.User().AddTags(user.ID, req.Tags); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.respond(w, r, http.StatusOK, req.Tags)
+
 	}
 
 }
@@ -109,6 +147,8 @@ func (s *server) handleUsersCreate() http.HandlerFunc {
 		if err := s.store.User().Create(u); err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 		}
+
+		s.logger.Info("User" + req.Email + " successfully created!")
 
 		u.Sanitize()
 		s.respond(w, r, http.StatusCreated, u)
@@ -157,4 +197,29 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}
+}
+
+func (s *server) setTags(user *model.User) (*model.User, error) {
+	tags, err := s.store.User().GetTags(user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	user.Tags = tags
+
+	return user, err
+
+}
+
+func (s *server) GenerateThemes(id int) ([]model.Theme, error) {
+	tags, err := s.store.User().GetTags(id)
+	if err != nil {
+		return nil, err
+	}
+	if len(tags) == 0 {
+		return nil, store.TagsNotfound
+	}
+
+	return nil, nil
+
 }
