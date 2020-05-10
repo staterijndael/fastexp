@@ -14,4 +14,6 @@ type UserRepository interface {
 	GetThemeTags(int) ([]model.TagTheme, error)
 	GetAllThemes() ([]model.Theme, error)
 	AddUserTheme(int, *model.Theme) error
+	CreateCard(*model.Card) error
+	DeleteCard(string)
 }

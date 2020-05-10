@@ -5,6 +5,7 @@ import (
 )
 
 type Card struct {
+	ID        int
 	Name      string
 	ShortDesc string
 	FullDesc  string

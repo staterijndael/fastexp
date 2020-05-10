@@ -1,0 +1,237 @@
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cards .container {
+  width: 70%;
+}
+
+.cards .card {
+  color: white;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 40px;
+  box-shadow: 0 0 20px #c7c7c7;
+  position: relative;
+}
+
+.card div + p {
+  color: #9c9ba4;
+}
+
+.cards h2 {
+  margin: 20px 0;
+  display: block;
+  padding: 0 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 36px;
+  color: grey;
+}
+
+.cards p {
+  color: #7b7b7d;
+  font-size: 25px;
+  margin: 20px 0;
+}
+
+.card .arrow {
+  margin: 40px auto;
+  width: 60px;
+  height: 60px;
+  background-color: #ee4d4d;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+
+.card .arrow:hover {
+  background-color: #ee6767;
+}
+
+.arrow span,
+.arrow span::before,
+.arrow span::after {
+  width: 12.5px;
+  height: 4px;
+  border-radius: 20%;
+  position: absolute;
+  left: 40%;
+  top: 40%;
+}
+
+.arrow span::before,
+.arrow span::after {
+  content: "";
+  background-color: white;
+  left: 0;
+}
+
+.arrow span::before {
+  bottom: 7px;
+  transform: rotate(31deg);
+}
+
+.arrow span::after {
+  top: 7px;
+  transform: rotate(-31deg);
+}
+
+.delete-card {
+  position: absolute;
+  top: -10px;
+  left: 90%;
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border: 2px solid lightgrey;
+  border-radius: 50%;
+}
+
+.delete-card span,
+.delete-card span::before,
+.delete-card span::after {
+  width: 26px;
+  height: 4px;
+  border-radius: 20%;
+  position: absolute;
+  left: 16.5%;
+  top: 46%;
+}
+
+.delete-card span::before,
+.delete-card span::after {
+  content: "";
+  left: 0;
+  top: 0;
+  background-color: lightgrey;
+}
+
+.delete-card span::before {
+  transform: rotate(45deg);
+}
+
+.delete-card span::after {
+  transform: rotate(-45deg);
+}
+.delete-card:hover {
+  border-color: grey;
+}
+
+.delete-card:hover span::before,
+.delete-card:hover span::after {
+  background-color: grey;
+}
+
+.cards .add-card {
+  justify-content: center;
+  align-items: center;
+}
+
+.add-card div {
+  border: 3px solid lightgrey;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  position: relative;
+}
+
+.add-card span,
+.add-card span::before {
+  width: 70px;
+  height: 7px;
+  border-radius: 20%;
+  position: absolute;
+  left: 15.5%;
+  top: 46%;
+  background-color: lightgrey;
+}
+
+.add-card span::before {
+  content: "";
+  top: 0;
+  left: 0;
+  transform: rotate(90deg);
+}
+
+.add-card div:hover {
+  border-color: grey;
+}
+
+.add-card div:hover span,
+.add-card div:hover span::before {
+  background-color: grey;
+}
+
+@media screen and (min-width: 1441px) and (max-width: 2560px) {
+  .cards .card {
+    min-height: 375px;
+    margin: 30px 2.5%;
+    width: 30%;
+  }
+
+  .delete-card {
+    left: 93%;
+  }
+
+  .cards .card:first-child,
+  .cards .card:nth-child(3n + 1) {
+    margin-left: 0;
+  }
+
+  .cards .card:nth-child(3n) {
+    margin-right: 0;
+  }
+}
+
+@media screen and (min-width: 1025px) and (max-width: 1440px) {
+  .cards .card {
+    margin: 30px 3%;
+    width: 47%;
+    min-height: 250px;
+  }
+
+  .delete-card {
+    left: 94%;
+  }
+
+  .cards .card:first-child,
+  .cards .card:nth-child(2n + 1) {
+    margin-left: 0;
+  }
+
+  .cards .card:nth-child(2n) {
+    margin-right: 0;
+  }
+}
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .cards .card {
+    margin: 30px 0;
+    width: 100%;
+    min-height: 150px;
+  }
+
+  .delete-card {
+    left: 94%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .cards .card {
+    margin: 30px 0;
+    width: 100%;
+    min-height: 150px;
+  }
+
+  .delete-card {
+    left: 94%;
+  }
+
+  .container {
+    width: 93%;
+  }
+}

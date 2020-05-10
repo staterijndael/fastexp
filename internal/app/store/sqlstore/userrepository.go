@@ -278,3 +278,23 @@ func (r *UserRepository) GetAllThemes() ([]model.Theme, error) {
 
 	return themes, nil
 }
+
+func (r *UserRepository) CreateCard(card *model.Card) error {
+	if err := card.ValidateCard(); err != nil {
+		return err
+	}
+
+	return r.store.db.QueryRow(
+		"INSERT INTO cards (name, shortdesc, fulldesc) VALUES ($1, $2) RETURNING id",
+		card.Name,
+		card.ShortDesc,
+		card.FullDesc,
+	).Scan(&card.ID)
+}
+
+func (r *UserRepository) DeleteCard(cardName string) {
+
+	r.store.db.Exec(
+		"DELETE FROM cards WHERE name = $1", cardName,
+	)
+}

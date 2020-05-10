@@ -1,2 +1,0 @@
-# Fastexp
-Fast explanation MTS

@@ -93,7 +93,7 @@ func (r *UserRepository) CreateTheme(th *model.Theme) error {
 
 }
 
-func (r *UserRepository) GetAllThemes(userID int) ([]model.Theme, error) {
+func (r *UserRepository) GetAllThemes() ([]model.Theme, error) {
 
 	return nil, nil
 }
@@ -112,4 +112,12 @@ func (r *UserRepository) AddThemeTags(themeID int, tags []string) error {
 
 func (r *UserRepository) AddUserTheme(userID int, th *model.Theme) error {
 	return nil
+}
+
+func (r *UserRepository) CreateCard(card *model.Card) error {
+	return nil
+}
+
+func (r *UserRepository) DeleteCard(cardID string) {
+
 }

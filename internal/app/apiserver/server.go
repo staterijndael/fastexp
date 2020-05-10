@@ -69,6 +69,8 @@ func (s *server) configureRouter() {
 	private.HandleFunc("/addtags", s.handleAddTags()).Methods("POST", "OPTIONS")
 	private.HandleFunc("/createtheme", s.handleCreateTheme()).Methods("POST", "OPTIONS")
 	private.HandleFunc("/generatethemes", s.handleGenerateThemes()).Methods("POST", "OPTIONS")
+	private.HandleFunc("/addcard", s.handleAddCard()).Methods("POST", "OPTIONS")
+	private.HandleFunc("/deletecard", s.handleDeleteCard()).Methods("POST", "OPTIONS")
 }
 
 func (s *server) authenticateUser(next http.Handler) http.Handler {
@@ -103,8 +105,47 @@ func (s *server) handleWhoami() http.HandlerFunc {
 
 }
 
-func (s *server) handleAddCard() httpHandlerFunc {
+func (s *server) handleAddCard() http.HandlerFunc {
+	type request struct {
+		Name      string
+		ShortDesc string
+		FullDesc  string
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		Card := model.Card{
+			Name:      req.Name,
+			ShortDesc: req.ShortDesc,
+			FullDesc:  req.FullDesc,
+		}
+		err := s.store.User().CreateCard(&Card)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
 
+		s.respond(w, r, http.StatusOK, Card)
+	}
+}
+
+func (s *server) handleDeleteCard() http.HandlerFunc {
+	type request struct {
+		Name string
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		s.store.User().DeleteCard(req.Name)
+
+		s.respond(w, r, http.StatusOK, "OK")
+	}
 }
 
 func (s *server) handleGenerateThemes() http.HandlerFunc {
