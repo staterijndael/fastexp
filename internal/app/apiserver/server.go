@@ -103,6 +103,10 @@ func (s *server) handleWhoami() http.HandlerFunc {
 
 }
 
+func (s *server) handleAddCard() httpHandlerFunc {
+
+}
+
 func (s *server) handleGenerateThemes() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -286,13 +290,13 @@ func (s *server) setTags(user *model.User) (*model.User, error) {
 		return nil, err
 	}
 
-	var tagsID []int
+	var tagsText []string
 
 	for _, tag := range tags {
-		tagsID = append(tagsID, tag.ID)
+		tagsText = append(tagsText, tag.Text)
 	}
 
-	user.Tags = tagsID
+	user.Tags = tagsText
 
 	return user, err
 

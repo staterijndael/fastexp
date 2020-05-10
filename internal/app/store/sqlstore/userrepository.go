@@ -79,7 +79,7 @@ func (r *UserRepository) Find(id int) (*model.User, error) {
 // AddTags ...
 func (r *UserRepository) AddTags(userID int, tags []string) error {
 
-	var tags2 []uint8
+	var tags2 []*string
 
 	if err := r.store.db.QueryRow("SELECT tags FROM users WHERE id=$1", userID).Scan(&tags2); err != nil {
 		if err == sql.ErrNoRows {
@@ -102,7 +102,7 @@ func (r *UserRepository) AddTags(userID int, tags []string) error {
 			return store.TagIsNull
 		}
 
-		var id uint8
+		var msg *string
 
 		// rows, err := r.store.db.NamedQuery("INSERT INTO tags (msg) VALUES (:msg) RETURNING id", tag)
 
@@ -111,21 +111,15 @@ func (r *UserRepository) AddTags(userID int, tags []string) error {
 		// }
 
 		r.store.db.QueryRow(
-			"INSERT INTO tags (msg) VALUES ($1) RETURNING id",
+			"INSERT INTO tags (msg) VALUES ($1) RETURNING msg",
 			tag,
-		).Scan(&id)
+		).Scan(msg)
 
-		tags2 = append(tags2, id)
+		tags2 = append(tags2, msg)
 
 	}
 
-	var finishArray []int
-
-	for _, tag2 := range tags2 {
-		finishArray = append(finishArray, int(tag2))
-	}
-
-	r.store.db.QueryRow("UPDATE users SET tags = $1 WHERE id = $2", pq.Array(finishArray), userID)
+	r.store.db.Exec("UPDATE users SET tags = $1 WHERE id = $2", pq.Array(tags2), userID)
 
 	return nil
 }
@@ -133,7 +127,7 @@ func (r *UserRepository) AddTags(userID int, tags []string) error {
 // GetTags ...
 func (r *UserRepository) GetTags(userID int) ([]model.Tag, error) {
 
-	var tags []uint8
+	var tags []string
 
 	err := r.store.db.QueryRow("SELECT tags FROM users WHERE id = $1", userID).Scan(
 		&tags,
@@ -146,17 +140,18 @@ func (r *UserRepository) GetTags(userID int) ([]model.Tag, error) {
 	var modelsTags []model.Tag
 
 	for _, tag := range tags {
+		var id int
 		var text string
 
-		r.store.db.QueryRow("SELECT msg FROM tags WHERE id = $1", tag).Scan(
+		r.store.db.QueryRow("SELECT id,msg FROM tags WHERE id = $1", tag).Scan(
+			&id,
 			&text,
 		)
 
 		modelTag := model.Tag{
+			ID:   id,
 			Text: text,
 		}
-
-		log.Print(text)
 
 		modelsTags = append(modelsTags, modelTag)
 	}
