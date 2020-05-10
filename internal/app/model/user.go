@@ -12,13 +12,13 @@ type User struct {
 	Email             string `json:"email"`
 	Password          string `json:"password,omitempty"`
 	EncryptedPassword string `json:"-"`
-	Tags              []Tag  `json:"tags"`
+	Tags              []int  `json:"tags"`
+	ThemesID          []int  `json:"theme"`
 }
 
 // Tag ...
 type Tag struct {
-	UserID int `json:"userid"`
-
+	ID   int    `json:"id"`
 	Text string `json:"tag"`
 }
 

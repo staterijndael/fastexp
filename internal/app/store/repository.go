@@ -10,4 +10,8 @@ type UserRepository interface {
 	CreateTheme(*model.Theme) error
 	Find(int) (*model.User, error)
 	FindByEmail(string) (*model.User, error)
+	AddThemeTags(int, []string) error
+	GetThemeTags(int) ([]model.TagTheme, error)
+	GetAllThemes() ([]model.Theme, error)
+	AddUserTheme(int, *model.Theme) error
 }

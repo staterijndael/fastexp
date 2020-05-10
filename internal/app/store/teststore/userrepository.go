@@ -1,8 +1,6 @@
 package teststore
 
 import (
-	"unicode/utf8"
-
 	"github.com/Oringik/fastexp/internal/app/model"
 	"github.com/Oringik/fastexp/internal/app/store"
 )
@@ -53,32 +51,32 @@ func (r *UserRepository) Find(id int) (*model.User, error) {
 
 // AddTags ...
 func (r *UserRepository) AddTags(userID int, tags []string) error {
-	u, ok := r.users[userID]
+	// u, ok := r.users[userID]
 
-	if !ok {
-		return store.ErrRecordNotFound
-	}
+	// if !ok {
+	// 	return store.ErrRecordNotFound
+	// }
 
-	for _, tag := range tags {
+	// for _, tag := range tags {
 
-		if _, ok2 := r.users[userID]; !ok2 {
-			return store.WrongUserTag
-		}
+	// 	if _, ok2 := r.users[userID]; !ok2 {
+	// 		return store.WrongUserTag
+	// 	}
 
-		if utf8.RuneCountInString(tag) > 10 {
-			return store.TagWrongLength
-		}
-		if utf8.RuneCountInString(tag) == 0 {
-			return store.TagIsNull
-		}
+	// 	if utf8.RuneCountInString(tag) > 10 {
+	// 		return store.TagWrongLength
+	// 	}
+	// 	if utf8.RuneCountInString(tag) == 0 {
+	// 		return store.TagIsNull
+	// 	}
 
-		tagStruct := model.Tag{
-			UserID: userID,
-			Text:   tag,
-		}
+	// 	tagStruct := model.Tag{
+	// 		ID: userID,
+	// 		Text:   tag,
+	// 	}
 
-		u.Tags = append(u.Tags, tagStruct)
-	}
+	// 	u.Tags = append(u.Tags, tagStruct)
+	// }
 
 	return nil
 }
@@ -93,4 +91,25 @@ func (r *UserRepository) GetTags(userID int) ([]model.Tag, error) {
 func (r *UserRepository) CreateTheme(th *model.Theme) error {
 	return nil
 
+}
+
+func (r *UserRepository) GetAllThemes(userID int) ([]model.Theme, error) {
+
+	return nil, nil
+}
+
+// GetTags ...
+func (r *UserRepository) GetThemeTags(themeID int) ([]model.TagTheme, error) {
+
+	return nil, nil
+}
+
+// AddTags ...
+func (r *UserRepository) AddThemeTags(themeID int, tags []string) error {
+
+	return nil
+}
+
+func (r *UserRepository) AddUserTheme(userID int, th *model.Theme) error {
+	return nil
 }

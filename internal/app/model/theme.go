@@ -9,9 +9,10 @@ type Theme struct {
 	Description string `json:"description"`
 }
 
+// TagTheme ...
 type TagTheme struct {
-	ThemeID int `json:"themeid"`
-	Text    int `json:"text"`
+	ThemeID int    `json:"themeid"`
+	Text    string `json:"text"`
 }
 
 // ValidateTheme ...

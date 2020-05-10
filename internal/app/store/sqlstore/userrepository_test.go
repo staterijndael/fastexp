@@ -69,14 +69,16 @@ func TestUserRepository_AddTag(t *testing.T) {
 func TestUserRepository_GetTags(t *testing.T) {
 
 	db, teardown := sqlstore.TestDB(t, databaseURL)
-	defer teardown("tags")
-
+	defer teardown("tags", "users")
 	s := sqlstore.New(db)
 	u1 := model.TestUser(t)
-	s.User().Create(u1)
+	err := s.User().Create(u1)
+	assert.NoError(t, err)
 	tags1 := []string{"asdasdasd", "asdasdads", "212kkasd", "sadasd"}
-	s.User().AddTags(u1.ID, tags1)
-	tags2, _ := s.User().GetTags(u1.ID)
+	err = s.User().AddTags(u1.ID, tags1)
+	assert.NoError(t, err)
+	tags2, err := s.User().GetTags(u1.ID)
+	assert.NoError(t, err)
 
 	var readyTags []string
 

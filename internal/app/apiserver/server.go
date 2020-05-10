@@ -53,7 +53,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 
 	cors := handlers.CORS(
-		handlers.AllowedHeaders([]string{"content-type"}),
+		handlers.AllowedHeaders([]string{"content-type", "set-cookie"}),
 		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowCredentials(),
 	)
@@ -67,7 +67,8 @@ func (s *server) configureRouter() {
 	private.Use(s.authenticateUser)
 	private.HandleFunc("/whoami", s.handleWhoami()).Methods("GET", "OPTIONS")
 	private.HandleFunc("/addtags", s.handleAddTags()).Methods("POST", "OPTIONS")
-	private.HandleFunc("/createtheme", s.handleAddTags()).Methods("POST", "OPTIONS")
+	private.HandleFunc("/createtheme", s.handleCreateTheme()).Methods("POST", "OPTIONS")
+	private.HandleFunc("/generatethemes", s.handleGenerateThemes()).Methods("POST", "OPTIONS")
 }
 
 func (s *server) authenticateUser(next http.Handler) http.Handler {
@@ -100,6 +101,82 @@ func (s *server) handleWhoami() http.HandlerFunc {
 		s.respond(w, r, http.StatusOK, user)
 	}
 
+}
+
+func (s *server) handleGenerateThemes() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(ctxKeyUser).(*model.User)
+		tags, err := s.store.User().GetTags(user.ID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		if len(tags) == 0 {
+			s.error(w, r, http.StatusBadRequest, store.TagsNotfound)
+			return
+		}
+
+		themes, err := s.store.User().GetAllThemes()
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		var needThemes []model.Theme
+
+		for _, theme := range themes {
+			tags2, err := s.store.User().GetThemeTags(theme.ID)
+			if err != nil {
+				s.error(w, r, http.StatusBadRequest, err)
+				return
+			}
+
+			for _, tag2 := range tags2 {
+				for _, tag := range tags {
+					if tag2.Text == tag.Text {
+						needThemes = append(needThemes, theme)
+					}
+				}
+			}
+
+		}
+
+		s.respond(w, r, http.StatusOK, needThemes)
+	}
+
+}
+
+func (s *server) handleCreateTheme() http.HandlerFunc {
+	type request struct {
+		Title       string
+		Description string
+		Tags        []string
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		theme := &model.Theme{
+			Title:       req.Title,
+			Description: req.Description,
+		}
+
+		err := s.store.User().CreateTheme(theme)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+
+		err = s.store.User().AddThemeTags(theme.ID, req.Tags)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+		}
+
+	}
 }
 
 func (s *server) handleAddTags() http.HandlerFunc {
@@ -160,6 +237,7 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -180,11 +258,12 @@ func (s *server) handleSessionsCreate() http.HandlerFunc {
 		}
 
 		session.Values["user_id"] = u.ID
-
 		if err := s.sessionStore.Save(r, w, session); err != nil {
 			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
+
+		s.respond(w, r, http.StatusOK, nil)
 	}
 }
 
@@ -200,26 +279,21 @@ func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data 
 }
 
 func (s *server) setTags(user *model.User) (*model.User, error) {
+
 	tags, err := s.store.User().GetTags(user.ID)
+
 	if err != nil {
 		return nil, err
 	}
 
-	user.Tags = tags
+	var tagsID []int
+
+	for _, tag := range tags {
+		tagsID = append(tagsID, tag.ID)
+	}
+
+	user.Tags = tagsID
 
 	return user, err
-
-}
-
-func (s *server) GenerateThemes(id int) ([]model.Theme, error) {
-	tags, err := s.store.User().GetTags(id)
-	if err != nil {
-		return nil, err
-	}
-	if len(tags) == 0 {
-		return nil, store.TagsNotfound
-	}
-
-	return nil, nil
 
 }

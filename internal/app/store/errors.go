@@ -9,4 +9,6 @@ var (
 	TagIsNull         = errors.New("Tag is null")
 	WrongUserTag      = errors.New("User in tag already created")
 	TagsNotfound      = errors.New("Tags not found")
+	ThemeNotFound     = errors.New("Theme not found")
+	RepeatedValue     = errors.New("Repeated value")
 )
