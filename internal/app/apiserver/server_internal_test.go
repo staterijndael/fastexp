@@ -153,3 +153,56 @@ func TestServer_HandleSessionsCreate(t *testing.T) {
 		})
 	}
 }
+
+func TestServer_AddTag(t *testing.T) {
+	store := teststore.New()
+	u := model.TestUser(t)
+	store.User().Create(u)
+
+	testCases := []struct {
+		name         string
+		cookieValue  map[interface{}]interface{}
+		tags         []string
+		expectedCode int
+	}{
+		{
+			name: "correct",
+			cookieValue: map[interface{}]interface{}{
+				"user_id": u.ID,
+			},
+			tags:         []string{"asdasd", "MTSONE", "MOU"},
+			expectedCode: http.StatusOK,
+		},
+		{
+			name: "wrong length",
+			cookieValue: map[interface{}]interface{}{
+				"user_id": u.ID},
+			expectedCode: http.StatusBadRequest,
+			tags:         []string{"asdasdasdasdasdasdasdasdasdhsgshads", "MTSONE", "MOU"},
+		},
+	}
+
+	secretKey := []byte("secret")
+	s := newServer(store, sessions.NewCookieStore(secretKey))
+	sc := securecookie.New(secretKey, nil)
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			cookieStr, _ := sc.Encode(sessionName, tc.cookieValue)
+
+			tags := map[string]interface{}{
+				"tags": tc.tags,
+			}
+			b := &bytes.Buffer{}
+			json.NewEncoder(b).Encode(tags)
+
+			req, _ := http.NewRequest(http.MethodPost, "/private/addtags", b)
+			req.Header.Set("Cookie", fmt.Sprintf("%s=%s", sessionName, cookieStr))
+			s.ServeHTTP(rec, req)
+			assert.Equal(t, tc.expectedCode, rec.Code)
+
+		})
+	}
+
+}
